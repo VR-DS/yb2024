@@ -1,0 +1,939 @@
+<html><head><base href="." /><title>School Yearbook 2024</title>
+<style>
+    :root {
+        --primary-color: #8B0000;
+        --secondary-color: #DC143C;
+        --accent-color: #FFD700;
+        --card-bg: #FFFFFF;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Georgia', serif;
+        background-color: #f5f5f5;
+        background-image: linear-gradient(45deg, var(--primary-color) 25%, transparent 25%),
+                          linear-gradient(-45deg, var(--primary-color) 25%, transparent 25%),
+                          linear-gradient(45deg, transparent 75%, var(--primary-color) 75%),
+                          linear-gradient(-45deg, transparent 75%, var(--primary-color) 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        background-blend-mode: soft-light;
+        perspective: 1000px;
+        background-blend-mode: overlay;
+    }
+
+    .header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 5px solid var(--accent-color);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .school-logo {
+        width: 180px;
+        height: 100px;
+        transition: transform 0.3s ease;
+        background: white;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .school-logo:hover {
+        transform: scale(1.05);
+    }
+
+    .school-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .floating-cards {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        transform-style: preserve-3d;
+    }
+
+    .card-symbol {
+        position: absolute;
+        font-size: 3rem;
+        color: var(--primary-color);
+        opacity: 0.2;
+        animation: float3D 10s linear infinite;
+        transform-style: preserve-3d;
+    }
+
+    @keyframes float3D {
+        0% {
+            transform: translateY(100vh) translateZ(-100px) rotate(0deg) scale(1);
+            opacity: 0;
+        }
+        50% {
+            opacity: 0.2;
+            transform: translateY(50vh) translateZ(100px) rotate(180deg) scale(1.5);
+        }
+        100% {
+            transform: translateY(-100px) translateZ(-100px) rotate(360deg) scale(1);
+            opacity: 0;
+        }
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .functions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 3rem;
+        margin-top: 3rem;
+    }
+
+    .function-card {
+        background: linear-gradient(145deg, var(--card-bg) 0%, #f8f8f8 100%);
+        border-radius: 15px;
+        padding: 2.5rem;
+        text-align: center;
+        transition: all 0.4s ease;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1), 
+                    inset 0 0 20px rgba(139, 0, 0, 0.1);
+        position: relative;
+        border: 2px solid var(--primary-color);
+        backdrop-filter: blur(5px);
+        overflow: hidden;
+    }
+
+    .function-card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent, rgba(255,215,0,0.1), transparent);
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .function-card::after {
+        content: '♥';
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        color: var(--secondary-color);
+        font-size: 1.5rem;
+    }
+
+    .function-card:hover {
+        transform: translateY(-10px) rotate(2deg);
+        box-shadow: 0 15px 30px rgba(220,20,60,0.2);
+    }
+
+    .function-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        color: var(--secondary-color);
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .grade-selector {
+        margin-top: 1.5rem;
+        padding: 0.8rem;
+        border-radius: 8px;
+        border: 2px solid var(--primary-color);
+        font-family: 'Georgia', serif;
+        background: var(--card-bg);
+        color: var(--primary-color);
+        cursor: pointer;
+    }
+
+    .yearbook-container {
+        background: linear-gradient(145deg, var(--card-bg) 0%, #f8f8f8 100%);
+        backdrop-filter: blur(5px);
+        padding: 2rem;
+        border-radius: 15px;
+        margin: 2rem 0;
+        border: 2px solid var(--primary-color);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .yearbook-pages {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .yearbook-page {
+        background: var(--card-bg);
+        padding: 1.5rem;
+        border: 1px solid var(--primary-color);
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        min-height: 400px;
+        width: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s ease;
+    }
+
+    .yearbook-page::before {
+        content: '';
+        position: absolute;
+        top: -100%;
+        left: -100%;
+        width: 300%;
+        height: 300%;
+        background: linear-gradient(
+            45deg,
+            transparent 0%,
+            rgba(255, 215, 0, 0.2) 30%,
+            rgba(220, 20, 60, 0.3) 50%,
+            rgba(255, 215, 0, 0.2) 70%,
+            transparent 100%
+        );
+        animation: shine 3s infinite linear;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .yearbook-page:hover {
+        transform: scale(1.05) rotate(2deg);
+        box-shadow: 0 15px 30px rgba(220,20,60,0.3),
+                    0 0 20px var(--accent-color);
+        border: 2px solid var(--accent-color);
+    }
+
+    .yearbook-page:hover::before {
+        opacity: 1;
+    }
+
+    .yearbook-page img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: all 0.5s ease;
+        filter: brightness(1);
+    }
+
+    .yearbook-page:hover img {
+        filter: brightness(1.2) contrast(1.1) drop-shadow(0 0 15px var(--accent-color));
+        transform: scale(1.02);
+    }
+
+    @keyframes shine {
+        0% {
+            transform: translate(-100%, -100%) rotate(45deg);
+        }
+        100% {
+            transform: translate(100%, 100%) rotate(45deg);
+        }
+    }
+
+    .yearbook-page::after {
+        content: '📚';
+        position: absolute;
+        font-size: 2rem;
+        bottom: -50px;
+        right: -50px;
+        transition: all 0.5s ease;
+        opacity: 0;
+    }
+
+    .yearbook-page:hover::after {
+        bottom: 10px;
+        right: 10px;
+        opacity: 1;
+        transform: rotate(360deg);
+    }
+
+    .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem;
+    }
+
+    .photo-container {
+        aspect-ratio: 1;
+        overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    .photo-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .photo-container:hover {
+        transform: scale(1.05);
+    }
+
+    .photo-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        opacity: 0;
+        visibility: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    .photo-modal.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-content {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.9);
+        max-width: 90vw;
+        max-height: 90vh;
+        transition: transform 0.3s ease;
+    }
+
+    .photo-modal.active .modal-content {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    .modal-image {
+        max-width: 100%;
+        max-height: 90vh;
+        border: 10px solid white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: white;
+        font-size: 3rem;
+        cursor: pointer;
+        z-index: 1001;
+        width: 50px;
+        height: 50px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .close-modal:hover {
+        transform: rotate(90deg);
+        background: var(--secondary-color);
+    }
+
+    .card-overlay {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 3.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        font-family: 'Georgia', serif;
+        background: rgba(255,255,255,0.9);
+        padding: 10px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        transform: rotate(-5deg);
+    }
+
+    .slideshow {
+        width: 100%;
+        height: 400px;  
+        margin: 2rem 0;
+        position: relative;
+        overflow: hidden;
+        border: 3px solid var(--primary-color);
+        border-radius: 15px;
+        padding: 1.5rem;
+        background: rgba(255,255,255,0.1);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1),
+                    inset 0 0 20px rgba(139, 0, 0, 0.1);
+    }
+
+    .slide-group {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        position: absolute;
+        width: calc(100% - 3rem);
+        height: calc(100% - 3rem);
+        opacity: 0;
+        transform: translateY(50px) rotateX(45deg);
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-style: preserve-3d;
+    }
+
+    .slide-group.active {
+        opacity: 1;
+        transform: translateY(0) rotateX(0);
+    }
+
+    .slide-group.exit {
+        opacity: 0;
+        transform: translateY(-50px) rotateX(-45deg);
+    }
+
+    .slide-item {
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        transform: scale(0.95);
+        transition: transform 0.4s ease;
+        border: 3px solid var(--accent-color);
+        background: white;
+    }
+
+    .slide-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, transparent, rgba(220,20,60,0.1), transparent);
+        z-index: 1;
+    }
+
+    .slide-item:hover {
+        transform: scale(1) translateY(-10px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+    }
+
+    .slide-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .slide-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,0.7));
+        padding: 1rem;
+        color: white;
+        font-size: 0.9rem;
+    }
+
+    .credits-section {
+        margin-top: 4rem;
+        padding: 2rem;
+        background: linear-gradient(145deg, var(--card-bg) 0%, #f8f8f8 100%);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        border: 2px solid var(--primary-color);
+    }
+
+    .credits-title {
+        color: var(--primary-color);
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .credits-content {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .credits-photo {
+        width: 300px;
+        height: 200px;
+        border-radius: 15px;
+        object-fit: cover;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        border: 3px solid var(--accent-color);
+    }
+
+    .credits-info {
+        flex: 1;
+        min-width: 300px;
+        max-width: 600px;
+    }
+
+    .credit-person {
+        margin-bottom: 1.5rem;
+    }
+
+    .credit-person h3 {
+        color: var(--secondary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .credit-person p {
+        color: var(--primary-color);
+        font-style: italic;
+    }
+    
+    .hidden {
+        display: none;
+    }
+
+    .download-btn {
+        display: inline-block;
+        margin-top: 1rem;
+        background-color: var(--accent-color);
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+
+    button {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Georgia', serif;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    button:hover {
+        background-color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+        color: var(--card-bg);
+        margin: 0;
+        font-size: 2.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    h2 {
+        color: var(--primary-color);
+        font-size: 1.8rem;
+    }
+</style>
+</head>
+<body>
+    <div class="floating-cards" id="floatingCards"></div>
+    <div class="header">
+        <h1>School Yearbook 2024</h1>
+        <div class="school-logo">
+            <img src="https://www.escoladual.com.br/hubfs/raw_assets/public/Site/eiu-floripa/assets/images/logo.png" alt="School Logo">
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="functions-grid">
+            <div class="function-card" onclick="showYearbook()">
+                <div class="function-icon">📚</div>
+                <h2>View Yearbook</h2>
+                <p>Browse through our digital yearbook</p>
+                <button>Open Yearbook</button>
+            </div>
+            <div class="function-card" onclick="showPhotoGallery()">
+                <div class="function-icon">📸</div>
+                <h2>Photo Gallery</h2>
+                <p>Browse photos by grade level</p>
+                <select class="grade-selector" onchange="showGradePhotos(this.value)">
+                    <option value="">Select Grade</option>
+                    <option value="9a">Grade 9A (Class of 2027)</option>
+                    <option value="11">Grade 11 (Class of 2025)</option>
+                    <option value="12">Grade 12 (Class of 2024)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="yearbook-viewer" class="hidden">
+            <div class="yearbook-container">
+                <h2>School Yearbook 2024</h2>
+                <div class="yearbook-pages">
+                    <div class="yearbook-page">
+                        <img src="https://imagizer.imageshack.com/img922/8014/Cq6UOL.png" alt="Yearbook Preview">
+                    </div>
+                </div>
+                <button class="download-btn" onclick="downloadYearbook()">
+                    Download Yearbook PDF
+                </button>
+            </div>
+        </div>
+
+        <div id="photo-gallery" class="hidden">
+            <div class="slideshow" id="slideshow">
+                <!-- Slides will be populated by JavaScript -->
+            </div>
+            <div class="photo-grid">
+                <!-- Photos will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="credits-section">
+            <h2 class="credits-title">Yearbook Team</h2>
+            <div class="credits-content">
+                <img src="https://imagizer.imageshack.com/img924/1604/AHB3mt.jpg" alt="Vitor and Lucia" class="credits-photo">
+                <div class="credits-info">
+                    <div class="credit-person">
+                        <h3>Vitor</h3>
+                        <p>Vice-President of Arts Committee</p>
+                        <p>Web Programmer & Yearbook Photography</p>
+                    </div>
+                    <div class="credit-person">
+                        <h3>Lucia</h3>
+                        <p>President of Arts Committee</p>
+                        <p>Yearbook Photography, Layout & Decor</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="photo-modal" id="photo-modal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <div class="card-overlay"></div>
+            <img class="modal-image" src="" alt="Full size photo">
+        </div>
+    </div>
+
+<script>
+    const grade12Photos = [
+        "https://imagizer.imageshack.com/img923/6495/Fgvp3i.jpg",
+        "https://imagizer.imageshack.com/img923/8690/W6bLOl.jpg",
+        "https://imagizer.imageshack.com/img922/60/UuF3xg.jpg",
+        "https://imagizer.imageshack.com/img923/7082/lkMKPz.jpg",
+        "https://imagizer.imageshack.com/img922/8478/mkwsif.jpg",
+        "https://imagizer.imageshack.com/img923/588/vm3D8J.jpg",
+        "https://imagizer.imageshack.com/img923/7551/dxJRMk.png",
+        "https://imagizer.imageshack.com/img922/7418/U2quVa.jpg",
+        "https://imagizer.imageshack.com/img924/6600/yVguoS.jpg",
+        "https://imagizer.imageshack.com/img923/6356/z9H1CQ.jpg",
+        "https://imagizer.imageshack.com/img924/8696/EYOOmR.jpg",
+        "https://imagizer.imageshack.com/img922/7369/q4os4b.jpg",
+        "https://imagizer.imageshack.com/img923/3320/9Py2Rt.jpg",
+        "https://imagizer.imageshack.com/img922/5315/H1VopJ.jpg",
+        "https://imagizer.imageshack.com/img924/6265/JDZkJ1.jpg",
+        "https://imagizer.imageshack.com/img922/7550/MkaCuV.jpg",
+        "https://imagizer.imageshack.com/img924/1299/qVtv8b.jpg",
+        "https://imagizer.imageshack.com/img924/1860/eLRbpX.png",
+        "https://imagizer.imageshack.com/img923/1695/B7aG66.jpg",
+        "https://imagizer.imageshack.com/img923/7316/OuYPUY.jpg",
+        "https://imagizer.imageshack.com/img924/3180/NFXcnm.jpg",
+        "https://imagizer.imageshack.com/img922/6299/SMocak.jpg",
+        "https://imagizer.imageshack.com/img924/7689/fkkhbC.jpg",
+        "https://imagizer.imageshack.com/img922/2523/oTOst1.jpg",
+        "https://imagizer.imageshack.com/img922/9369/f7LVNm.jpg",
+        "https://imagizer.imageshack.com/img923/7017/fEXY8j.jpg",
+        "https://imagizer.imageshack.com/img923/826/0BsH6Z.jpg",
+        "https://imagizer.imageshack.com/img922/8909/gZaEUG.jpg",
+        "https://imagizer.imageshack.com/img923/5585/drBs5i.jpg",
+        "https://imagizer.imageshack.com/img924/8580/yV2YOQ.jpg",
+        "https://imagizer.imageshack.com/img924/7853/GT8C36.jpg",
+        "https://imagizer.imageshack.com/img922/5206/2SPaPj.jpg",
+        "https://imagizer.imageshack.com/img922/1520/ocsYtN.jpg",
+        "https://imagizer.imageshack.com/img924/3828/3pzQrI.jpg",
+        "https://imagizer.imageshack.com/img924/9176/340B66.jpg",
+        "https://imagizer.imageshack.com/img923/1631/oXc4LQ.jpg",
+        "https://imagizer.imageshack.com/img923/1545/0mqpXK.jpg",
+        "https://imagizer.imageshack.com/img924/3592/oWwzQY.jpg",
+        "https://imagizer.imageshack.com/img923/3065/XjM0be.jpg",
+        "https://imagizer.imageshack.com/img922/4964/IbMwzT.jpg"
+    ];
+
+    const grade11Photos = [
+        "https://imagizer.imageshack.com/img923/9201/gFEvn2.jpg",
+        "https://imagizer.imageshack.com/img922/6203/P7AU7u.jpg",
+        "https://imagizer.imageshack.com/img922/6118/qEuJBd.jpg",
+        "https://imagizer.imageshack.com/img923/5796/oWER9y.jpg",
+        "https://imagizer.imageshack.com/img923/3560/FyB4sa.jpg",
+        "https://imagizer.imageshack.com/img922/1639/tKZ8fS.jpg",
+        "https://imagizer.imageshack.com/img924/8046/RIdFl6.jpg",
+        "https://imagizer.imageshack.com/img924/3716/kMQ2qU.jpg",
+        "https://imagizer.imageshack.com/img922/460/Me2yYu.jpg",
+        "https://imagizer.imageshack.com/img924/2120/uzhKjK.jpg",
+        "https://imagizer.imageshack.com/img924/5586/R5bnhw.jpg",
+        "https://imagizer.imageshack.com/img923/5089/UtdR89.jpg"
+    ];
+
+    const grade9aPhotos = [
+        "https://imagizer.imageshack.com/img922/8149/l5ESAB.jpg",
+        "https://imagizer.imageshack.com/img923/5552/yQH9Up.jpg",
+        "https://imagizer.imageshack.com/img923/9259/UfwnE1.jpg",
+        "https://imagizer.imageshack.com/img922/500/KjA4PD.jpg",
+        "https://imagizer.imageshack.com/img923/916/PlXWW3.jpg",
+        "https://imagizer.imageshack.com/img924/2487/pys3EU.jpg",
+        "https://imagizer.imageshack.com/img922/2856/WLMw8d.jpg",
+        "https://imagizer.imageshack.com/img922/2779/81PB40.jpg",
+        "https://imagizer.imageshack.com/img923/160/4aBqqj.jpg",
+        "https://imagizer.imageshack.com/img922/5098/kCcZBO.jpg",
+        "https://imagizer.imageshack.com/img923/6271/j3Pv9s.jpg",
+        "https://imagizer.imageshack.com/img924/2944/Uoed3P.jpg",
+        "https://imagizer.imageshack.com/img923/7457/GuUEL1.jpg",
+        "https://imagizer.imageshack.com/img924/6718/lJfmEo.jpg",
+        "https://imagizer.imageshack.com/img923/5115/inRpGS.jpg",
+        "https://imagizer.imageshack.com/img922/1108/5p0YnT.jpg",
+        "https://imagizer.imageshack.com/img922/1097/bOTXvg.jpg"
+    ];
+
+    const mockPhotos = [
+        { grade: "9A", description: "Class 9A 2024" },
+        { grade: "11", description: "Class 11 2024" },
+        { grade: "12", description: "Class of 2024" }
+    ];
+
+    function getAllPhotos() {
+        return [...grade12Photos, ...grade11Photos, ...grade9aPhotos];
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function createSlideGroups() {
+        const allPhotos = shuffleArray(getAllPhotos());
+        const groups = [];
+        const photosPerGroup = 4;
+        
+        for (let i = 0; i < allPhotos.length; i += photosPerGroup) {
+            groups.push(allPhotos.slice(i, i + photosPerGroup));
+        }
+        
+        return groups;
+    }
+
+    function createSlideshow() {
+        const slideshow = document.getElementById('slideshow');
+        slideshow.innerHTML = '';
+        
+        const groups = createSlideGroups();
+        
+        groups.forEach((group, groupIndex) => {
+            const slideGroup = document.createElement('div');
+            slideGroup.className = `slide-group ${groupIndex === 0 ? 'active' : ''}`;
+            
+            group.forEach((photoUrl) => {
+                let gradeLabel = "Class of 2024"; // default
+                if (grade11Photos.includes(photoUrl)) {
+                    gradeLabel = "Class of 2025";
+                } else if (grade9aPhotos.includes(photoUrl)) {
+                    gradeLabel = "Class of 2027";
+                }
+                
+                const slideItem = document.createElement('div');
+                slideItem.className = 'slide-item';
+                slideItem.innerHTML = `
+                    <img src="${photoUrl}" alt="Slideshow photo">
+                    <div class="slide-overlay">
+                        <div class="grade-info">${gradeLabel}</div>
+                    </div>
+                `;
+                slideGroup.appendChild(slideItem);
+            });
+            
+            slideshow.appendChild(slideGroup);
+        });
+    }
+
+    function rotateSlides() {
+        const groups = document.querySelectorAll('.slide-group');
+        const currentGroup = document.querySelector('.slide-group.active');
+        
+        if (!currentGroup) return;
+        
+        currentGroup.classList.add('exit');
+        currentGroup.classList.remove('active');
+        
+        let nextGroup = currentGroup.nextElementSibling;
+        if (!nextGroup) {
+            nextGroup = groups[0];
+        }
+        
+        nextGroup.classList.add('active');
+        
+        setTimeout(() => {
+            currentGroup.classList.remove('exit');
+        }, 1000);
+    }
+
+    function showYearbook() {
+        document.getElementById('yearbook-viewer').classList.remove('hidden');
+        document.getElementById('photo-gallery').classList.add('hidden');
+    }
+
+    function showPhotoGallery() {
+        document.getElementById('photo-gallery').classList.remove('hidden');
+        document.getElementById('yearbook-viewer').classList.add('hidden');
+        createSlideshow();
+    }
+
+    function downloadYearbook() {
+        window.location.href = 'https://drive.google.com/uc?export=download&id=1t0fg_eZaGV2scvhGN130f5EfM4QCQN12';
+    }
+
+    function getRandomCardValue() {
+        const values = ['A', 'K', 'Q'];
+        const suits = ['♠', '♥', '♦', '♣'];
+        const colors = ['red', 'black'];
+        
+        return {
+            value: values[Math.floor(Math.random() * values.length)],
+            suit: suits[Math.floor(Math.random() * suits.length)],
+            color: colors[Math.floor(Math.random() * colors.length)]
+        };
+    }
+
+    function createPhotoModal() {
+        const modal = document.createElement('div');
+        modal.className = 'photo-modal';
+        modal.id = 'photo-modal';
+        modal.innerHTML = `
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="modal-content">
+                <div class="card-overlay"></div>
+                <img class="modal-image" src="" alt="Full size photo">
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    function closeModal() {
+        document.getElementById('photo-modal').classList.remove('active');
+    }
+
+    document.getElementById('photo-modal').addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal-image') || e.target.classList.contains('card-overlay')) {
+            return;
+        }
+        closeModal();
+    });
+
+    function showGradePhotos(grade) {
+        if (!grade) return;
+        
+        const photoGrid = document.querySelector('.photo-grid');
+        photoGrid.innerHTML = '';
+        
+        let photos;
+        let gradeLabel;
+        switch(grade) {
+            case "12":
+                photos = grade12Photos;
+                gradeLabel = "Class of 2024";
+                break;
+            case "11":
+                photos = grade11Photos;
+                gradeLabel = "Class of 2025";
+                break;
+            case "9a":
+                photos = grade9aPhotos;
+                gradeLabel = "Class of 2027";
+                break;
+            default:
+                return;
+        }
+        
+        photos.forEach((photoUrl, index) => {
+            const photoContainer = document.createElement('div');
+            photoContainer.className = 'photo-container';
+            photoContainer.innerHTML = `
+                <img src="${photoUrl}" alt="${gradeLabel} Photo ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;">
+            `;
+            
+            photoContainer.addEventListener('click', () => {
+                const modal = document.getElementById('photo-modal');
+                const modalImg = modal.querySelector('.modal-image');
+                const cardOverlay = modal.querySelector('.card-overlay');
+                const card = getRandomCardValue();
+                
+                modalImg.src = photoUrl;
+                cardOverlay.textContent = `${card.value}${card.suit}`;
+                cardOverlay.style.color = card.color;
+                
+                // Pre-load image before showing modal
+                const img = new Image();
+                img.onload = () => {
+                    modal.classList.add('active');
+                    modalImg.style.opacity = 1;
+                };
+                img.src = photoUrl;
+            });
+            
+            photoGrid.appendChild(photoContainer);
+        });
+    }
+
+    function createFloatingCards() {
+        const container = document.getElementById('floatingCards');
+        const symbols = ['♠', '♥', '♦', '♣'];
+        const numCards = 40;
+        
+        container.innerHTML = '';
+        
+        for (let i = 0; i < numCards; i++) {
+            const card = document.createElement('div');
+            card.className = 'card-symbol';
+            card.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+            card.style.left = `${Math.random() * 100}vw`;
+            card.style.animationDelay = `${Math.random() * 10}s`;
+            card.style.animationDuration = `${10 + Math.random() * 5}s`;
+            card.style.transform = `translateZ(${Math.random() * 200 - 100}px)`;
+            container.appendChild(card);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('yearbook-viewer').classList.add('hidden');
+        document.getElementById('photo-gallery').classList.remove('hidden'); // Show slideshow by default
+        createFloatingCards();
+        setInterval(rotateSlides, 4000);
+        setInterval(createFloatingCards, 15000); 
+        createPhotoModal();
+        createSlideshow(); // Initialize slideshow immediately
+    });
+</script>
+</body></html>
